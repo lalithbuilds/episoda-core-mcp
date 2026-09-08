@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-LongMemEval Benchmark for Engram MCP
+LongMemEval Benchmark for episoda MCP
 Measures retrieval accuracy (R@5, R@10, etc.)
 """
 
@@ -10,15 +10,15 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-# Import Engram's core functions
+# Import episoda's core functions
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Need to set DB_PATH before importing server so it creates isolated benchmark DB
-db_path = Path.home() / "engram-benchmarks" / "memory.db"
+db_path = Path.home() / "episoda-benchmarks" / "memory.db"
 db_path.parent.mkdir(parents=True, exist_ok=True)
-os.environ["ENGRAM_DB_PATH"] = str(db_path)
+os.environ["episoda_DB_PATH"] = str(db_path)
 
-import server  # Engram's server module
+import server  # episoda's server module
 
 
 def now():
@@ -112,7 +112,7 @@ def evaluate_single_item(conn, item):
 
 
 def run_benchmark(dataset_path, output_file="longmemeval_results.json"):
-    print(f"[engram-longmemeval] Loading dataset from {dataset_path}")
+    print(f"[episoda-longmemeval] Loading dataset from {dataset_path}")
     dataset = load_longmemeval(dataset_path)
 
     results = {
@@ -173,7 +173,7 @@ def run_benchmark(dataset_path, output_file="longmemeval_results.json"):
         json.dump(results, f, indent=2)
 
     print("\n" + "=" * 60)
-    print("LONGMEMEVAL BENCHMARK RESULTS FOR ENGRAM MCP")
+    print("LONGMEMEVAL BENCHMARK RESULTS FOR episoda MCP")
     print("=" * 60)
     print(f"Total questions:       {results['metrics']['total_questions']}")
     print(f"Answerable questions:  {results['metrics']['answerable_questions']}")

@@ -12,28 +12,28 @@ Set Theme "Dracula"
 Set TypingSpeed 40ms
 
 Hide
-Type "alias engram='python3 engram.py'" Enter
+Type "alias episoda='python3 episoda.py'" Enter
 Type "rm -f memory.db*" Enter
 Type "clear" Enter
 Show
 
 Sleep 500ms
-Type "engram save 'Deployed the new caching layer using Redis' -c devops"
+Type "episoda save 'Deployed the new caching layer using Redis' -c devops"
 Sleep 200ms
 Enter
 Sleep 1s
 
-Type "engram save 'Redis connection string is in AWS Secrets Manager'"
+Type "episoda save 'Redis connection string is in AWS Secrets Manager'"
 Sleep 200ms
 Enter
 Sleep 1s
 
-Type "engram search 'Redis'"
+Type "episoda search 'Redis'"
 Sleep 200ms
 Enter
 Sleep 2s
 
-Type "engram stats"
+Type "episoda stats"
 Sleep 200ms
 Enter
 Sleep 3s

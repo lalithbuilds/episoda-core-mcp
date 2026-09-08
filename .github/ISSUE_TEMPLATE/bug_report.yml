@@ -1,11 +1,11 @@
 name: "🐛 Bug Report"
-description: "Report a bug or unexpected behavior in engram-mcp"
+description: "Report a bug or unexpected behavior in episoda-mcp"
 title: "[BUG]: "
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
-      value: "Thanks for reporting an issue with engram-mcp!"
+      value: "Thanks for reporting an issue with episoda-mcp!"
   - type: dropdown
     id: client
     attributes:
@@ -22,6 +22,6 @@ body:
     id: reproduction
     attributes:
       label: Steps to Reproduce
-      placeholder: "1. Run engram save..."
+      placeholder: "1. Run episoda save..."
     validations:
       required: true

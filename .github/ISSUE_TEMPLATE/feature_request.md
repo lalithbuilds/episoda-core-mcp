@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest an idea for engram-mcp
+about: Suggest an idea for episoda-mcp
 title: "feat: "
 labels: enhancement
 assignees: lalithbuilds

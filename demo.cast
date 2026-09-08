@@ -1,4 +1,4 @@
-{"version": 2, "width": 90, "height": 24, "timestamp": 1785142958, "env": {"TERM": "xterm-256color", "SHELL": "/bin/zsh"}}
+{"version": 2, "width": 90, "height": 24, "timestamp": 1788856637, "env": {"TERM": "xterm-256color", "SHELL": "/bin/zsh"}}
 [0.1, "o", "\u001b[1;32m\u279c\u001b[0m \u001b[1;36m~\u001b[0m "]
 [0.5, "o", "e"]
 [0.6, "o", "n"]
@@ -91,6 +91,6 @@
 [11.5, "o", "t"]
 [11.6, "o", "s"]
 [11.7, "o", "\r\n"]
-[12.0, "o", "TOTAL MEMORIES : 1\r\nDB SIZE        : 12,288 bytes  (12 KB)\r\nDB PATH        : /Users/user/engram-mcp/memory.db\r\n\r\nCATEGORIES:\r\n  pref                 1 memories\r\n"]
+[12.0, "o", "TOTAL MEMORIES : 1\r\nDB SIZE        : 12,288 bytes  (12 KB)\r\nDB PATH        : /Users/user/episoda-core-mcp/memory.db\r\n\r\nCATEGORIES:\r\n  pref                 1 memories\r\n"]
 [12.5, "o", "\u001b[1;32m\u279c\u001b[0m \u001b[1;36m~\u001b[0m "]
 [15.0, "o", ""]

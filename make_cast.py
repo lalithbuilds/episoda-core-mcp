@@ -110,7 +110,7 @@ def create_cast(filename):
         [
             12.0,
             "o",
-            "TOTAL MEMORIES : 1\r\nDB SIZE        : 12,288 bytes  (12 KB)\r\nDB PATH        : /Users/user/engram-mcp/memory.db\r\n\r\nCATEGORIES:\r\n  pref                 1 memories\r\n",
+            "TOTAL MEMORIES : 1\r\nDB SIZE        : 12,288 bytes  (12 KB)\r\nDB PATH        : /Users/user/episoda-core-mcp/memory.db\r\n\r\nCATEGORIES:\r\n  pref                 1 memories\r\n",
         ],
         [12.5, "o", "\x1b[1;32m➜\x1b[0m \x1b[1;36m~\x1b[0m "],
         [15.0, "o", ""],

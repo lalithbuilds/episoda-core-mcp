@@ -18,14 +18,14 @@
 
 ### Claude Code (CLI)
 ```bash
-claude mcp add engram python3 /absolute/path/to/episoda-core-mcp/server.py
+claude mcp add episoda python3 /absolute/path/to/episoda-core-mcp/server.py
 ```
 
 ### Claude Desktop (`claude_desktop_config.json`)
 ```json
 {
   "mcpServers": {
-    "engram": {
+    "episoda": {
       "command": "python3",
       "args": ["/absolute/path/to/episoda-core-mcp/server.py"]
     }
@@ -37,7 +37,7 @@ claude mcp add engram python3 /absolute/path/to/episoda-core-mcp/server.py
 ```json
 {
   "mcpServers": {
-    "engram": {
+    "episoda": {
       "command": "python3",
       "args": ["/absolute/path/to/episoda-core-mcp/server.py"]
     }

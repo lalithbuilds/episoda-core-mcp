@@ -1,11 +1,11 @@
-# DESIGN.md — engram-mcp
+# DESIGN.md — episoda-mcp
 
 <img src="https://capsule-render.vercel.app/api?type=rect&color=ff79c6&height=2&width=100%"/>
 
 
 > One file. Four decisions. Each one explains what I chose, what I rejected, and why.
 
-Engram is a memory layer for LLM agents. It exposes 6 tools over MCP (Model Context Protocol) and persists everything to a single SQLite file on disk. No cloud, no embedding service, no runtime dependencies beyond the Python standard library. The whole server is ~560 lines of self-contained, defensive standard-library Python.
+Episoda is a memory layer for LLM agents. It exposes 6 tools over MCP (Model Context Protocol) and persists everything to a single SQLite file on disk. No cloud, no embedding service, no runtime dependencies beyond the Python standard library. The whole server is ~560 lines of self-contained, defensive standard-library Python.
 
 The design is intentionally boring. Every choice below was made to keep the system debuggable by a single developer at 2 AM.
 
@@ -20,7 +20,7 @@ The design is intentionally boring. Every choice below was made to keep the syst
 - A `UNIQUE(content)` constraint (works, but locks comparison to exact bytes — whitespace differences create false duplicates).
 - A `created_at` field inside the hash (this was the v1 bug — it made every save unique).
 
-**Why.** Content-addressed IDs give dedup for free as a side effect of the primary key. The hash is 12 chars because collisions at 48 bits across a personal memory store (~10k rows) are statistically irrelevant. If Engram ever scales to millions of rows, bump to 16 chars — no schema migration needed.
+**Why.** Content-addressed IDs give dedup for free as a side effect of the primary key. The hash is 12 chars because collisions at 48 bits across a personal memory store (~10k rows) are statistically irrelevant. If Episoda ever scales to millions of rows, bump to 16 chars — no schema migration needed.
 
 **Trade-off.** Identical content with different `tags` or `category` collapses into one row. The newer write wins on those fields via `ON CONFLICT DO UPDATE`. If you need versioned memories, this is the wrong primitive.
 
@@ -58,11 +58,11 @@ The design is intentionally boring. Every choice below was made to keep the syst
 
 ## 4. Why Conflict Surfacing and Native Backups (Self-Healing)
 
-**Decision.** Engram warns the AI agent on save if it detects a highly similar memory, and uses Python's native `sqlite3.backup()` API for daily snapshots (`memory.db.bak`).
+**Decision.** Episoda warns the AI agent on save if it detects a highly similar memory, and uses Python's native `sqlite3.backup()` API for daily snapshots (`memory.db.bak`).
 
 **What I rejected.**
 - **Overwriting aggressively:** An agent saving "We use Mongo" shouldn't silently live next to an older "We use Postgres" memory, creating a schizophrenic context window.
-- **`shutil.copy2` for backups:** Because Engram runs in WAL mode, copying just the `.db` file without the `.db-wal` file risks generating corrupted or incomplete backups.
+- **`shutil.copy2` for backups:** Because Episoda runs in WAL mode, copying just the `.db` file without the `.db-wal` file risks generating corrupted or incomplete backups.
 
 **Why.** Conflict Surfacing uses a quick heuristic FTS5 query *before* insertion. If it finds overlaps, it attaches a warning payload directly to the JSON-RPC response so the LLM can self-correct or call `memory_delete`. Native backups ensure the personal datastore is highly resilient without needing an external cron job.
 
@@ -70,16 +70,16 @@ The design is intentionally boring. Every choice below was made to keep the syst
 
 ## 5. Why MCP over a custom protocol (not REST, not gRPC, not raw stdio JSON)
 
-**Decision.** Engram speaks JSON-RPC 2.0 over stdio, implements `initialize`, `tools/list`, `tools/call`, and the `notifications/*` lifecycle methods. `protocolVersion` is pinned to `2024-11-05`.
+**Decision.** Episoda speaks JSON-RPC 2.0 over stdio, implements `initialize`, `tools/list`, `tools/call`, and the `notifications/*` lifecycle methods. `protocolVersion` is pinned to `2024-11-05`.
 
 **What I rejected.**
 - **REST API (Flask/FastAPI).** Wrong shape — MCP servers are tools called by an LLM host, not endpoints called by a browser. Would require a port, an auth story, and a process supervisor. Three things I don't want for a personal memory layer.
 - **gRPC.** Schema-first is nice, but protobuf adds a build step and the binary wire format is hostile to debugging. JSON-RPC over stdio lets you `echo '{"jsonrpc":"2.0",...}' | python3 server.py` and read the response with your eyes.
-- **Custom JSON-over-stdio.** Tempting (smaller surface), but then no agent host supports it. MCP is the standard Anthropic, Cursor, Zed, and Claude Desktop already speak. Picking it means Engram works in any of them with zero integration code.
+- **Custom JSON-over-stdio.** Tempting (smaller surface), but then no agent host supports it. MCP is the standard Anthropic, Cursor, Zed, and Claude Desktop already speak. Picking it means Episoda works in any of them with zero integration code.
 
 **Why.** MCP is the only choice that gives me agent-host interop for free. The protocol is small enough to implement by hand in ~40 lines (see `handle()` in `server.py`). No SDK dependency.
 
-**Trade-off.** MCP is young (the spec is at `2024-11-05`). If the protocol changes, Engram's `initialize` response needs updating. Pinned version makes this explicit.
+**Trade-off.** MCP is young (the spec is at `2024-11-05`). If the protocol changes, Episoda's `initialize` response needs updating. Pinned version makes this explicit.
 
 ---
 
@@ -89,10 +89,10 @@ The design is intentionally boring. Every choice below was made to keep the syst
 LLM host (Claude / Cursor / Zed)
         │  JSON-RPC 2.0 over stdio
         ▼
-  engram-mcp server.py  (~280 lines, stdlib only)
+  episoda-mcp server.py  (~280 lines, stdlib only)
         │  parameterized SQL via sqlite3
         ▼
-  ~/engram-mcp/memory.db  (SQLite + WAL + FTS5)
+  ~/episoda-mcp/memory.db  (SQLite + WAL + FTS5)
         ├── memories       (PK: sha1(content)[:12])
         ├── memories_fts   (FTS5, porter+unicode61)
         └── triggers       (Native SQLite FTS sync)
@@ -103,7 +103,7 @@ Six tools: `memory_auto_context` (session boot), `memory_smart_search` (keyword)
 ## Known limitations
 
 1. **FTS5 is keyword-only.** No semantic recall. See §3.
-2. **Decay is per-process.** Each `engram-mcp` process keeps its own `_LAST_DECAY_RUN` timestamp. Two simultaneous MCP servers will both run decay within the same hour — wasted work, not corruption (the UPDATE is idempotent given the `updated_at` guard).
+2. **Decay is per-process.** Each `episoda-mcp` process keeps its own `_LAST_DECAY_RUN` timestamp. Two simultaneous MCP servers will both run decay within the same hour — wasted work, not corruption (the UPDATE is idempotent given the `updated_at` guard).
 3. **Single-writer ceiling.** SQLite handles ~50-100 writes/sec. For a personal memory layer this is infinite headroom. For a multi-tenant service it's a wall.
 4. **No auth.** The MCP server trusts its host. Don't expose the stdio bridge over a network.
 

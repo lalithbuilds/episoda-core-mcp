@@ -1,4 +1,4 @@
-# Contributing to Engram MCP
+# Contributing to Episoda MCP
 
 <img src="https://capsule-render.vercel.app/api?type=rect&color=ff79c6&height=2&width=100%"/>
 
@@ -16,7 +16,7 @@ Thanks for your interest in contributing! This project follows the **Ponytail Ph
 1. Fork the repo.
 2. Create a feature branch: `git checkout -b feat/your-feature`
 3. Make your changes. Keep them focused and small.
-4. Test manually with the CLI: `python3 engram.py stats`
+4. Test manually with the CLI: `python3 episoda.py stats`
 5. Commit with a clear message: `git commit -m "feat: add X"`
 6. Push and open a Pull Request.
 

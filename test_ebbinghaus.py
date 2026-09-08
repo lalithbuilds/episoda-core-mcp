@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 # Set the DB path to a temporary file before importing server
 temp_dir = tempfile.TemporaryDirectory()
-os.environ["ENGRAM_DB_PATH"] = str(Path(temp_dir.name) / "test_memory.db")
+os.environ["EPISODA_DB_PATH"] = str(Path(temp_dir.name) / "test_memory.db")
 
 import server
 

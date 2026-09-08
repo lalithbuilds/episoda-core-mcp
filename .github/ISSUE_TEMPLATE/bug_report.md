@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Something is broken in engram-mcp
+about: Something is broken in episoda-mcp
 title: "bug: "
 labels: bug
 assignees: lalithbuilds
@@ -10,7 +10,7 @@ assignees: lalithbuilds
 A clear description of the bug.
 
 **Steps to reproduce**
-1. Run `python3 engram.py ...`
+1. Run `python3 episoda.py ...`
 2. See error
 
 **Expected behavior**

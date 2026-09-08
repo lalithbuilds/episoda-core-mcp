@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ENGRAM MCP SERVER v1.0.0 — PONYTAIL EDITION (Aug 2026)
+EPISODA CORE MCP SERVER v1.0.0 — PONYTAIL EDITION (Aug 2026)
 Zero bloat. Zero cloud. Pure SQLite Standard Library.
 """
 
@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 DB_PATH = Path(
-    os.environ.get("ENGRAM_DB_PATH", Path.home() / "engram-mcp" / "memory.db")
+    os.environ.get("EPISODA_DB_PATH", Path.home() / "episoda-core-mcp" / "memory.db")
 )
 
 SCHEMA = """
@@ -105,7 +105,7 @@ def get_db(read_only=False):
                 backup_path.touch()
                 if not backup_path.is_symlink(): os.chmod(backup_path, 0o600)
             except Exception as e:
-                sys.stderr.write(f"[engram-backup] Backup failed: {e}\n")
+                sys.stderr.write(f"[episoda-backup] Backup failed: {e}\n")
 
     return conn
 
@@ -138,7 +138,7 @@ MAX_CONTENT = 8000
 # Categories excluded from auto-context boot (noise/bulk-import data)
 _NOISE_CATS = tuple(
     c.strip()
-    for c in os.environ.get("ENGRAM_EXCLUDE_CATEGORIES", "stress_test,obsidian_import").split(",")
+    for c in os.environ.get("EPISODA_EXCLUDE_CATEGORIES", "stress_test,obsidian_import").split(",")
     if c.strip()
 )
 
@@ -265,7 +265,7 @@ def t_save(a):
                         if len(shared) >= 2:
                             warnings.append(f"Similar memory found (ID {c['id']}): {c['content'][:50]}... Did you mean to update it?")
             except Exception as e:
-                sys.stderr.write(f"[engram-conflict] Warning FTS5 error: {e}\n")
+                sys.stderr.write(f"[episoda-conflict] Warning FTS5 error: {e}\n")
 
     conn.execute(
         """INSERT INTO memories (id,category,content,tags,importance,created_at,updated_at,access_count,last_accessed_at) 
@@ -444,7 +444,7 @@ def handle(msg):
                 "result": {
                     "protocolVersion": "2024-11-05",
                     "capabilities": {"tools": {}},
-                    "serverInfo": {"name": "engram-mcp", "version": "1.0.0"},
+                    "serverInfo": {"name": "episoda-core-mcp", "version": "1.0.0"},
                 },
             }
         )
@@ -518,7 +518,7 @@ def handle(msg):
 
 
 def main():
-    sys.stderr.write("[engram-mcp v1.0.0] Booting...\n")
+    sys.stderr.write("[episoda-core-mcp v1.0.0] Booting...\n")
     if len(sys.argv) > 1:
         if sys.argv[1] == "--diagnostics":
             try:
@@ -559,7 +559,7 @@ def main():
             sys.stdout.write(json.dumps(err_res) + "\n")
             sys.stdout.flush()
         except Exception as e:
-            sys.stderr.write(f"[engram-mcp] {e}\n")
+            sys.stderr.write(f"[episoda-core-mcp] {e}\n")
             err_res = {"jsonrpc": "2.0", "id": None, "error": {"code": -32603, "message": "Internal error"}}
             sys.stdout.write(json.dumps(err_res) + "\n")
             sys.stdout.flush()

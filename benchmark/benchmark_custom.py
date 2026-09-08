@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Custom Engram-Specific Benchmarks
+Custom episoda-Specific Benchmarks
 Tests: FTS5 vs LIKE, Auto-decay, Concurrency, etc.
 """
 
@@ -11,9 +11,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-db_path = Path.home() / "engram-benchmarks" / "memory.db"
+db_path = Path.home() / "episoda-benchmarks" / "memory.db"
 db_path.parent.mkdir(parents=True, exist_ok=True)
-os.environ["ENGRAM_DB_PATH"] = str(db_path)
+os.environ["episoda_DB_PATH"] = str(db_path)
 
 
 import server

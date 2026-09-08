@@ -25,7 +25,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          python3 -m unittest test_engram.py test_ebbinghaus.py
+          python3 -m unittest test_episoda.py test_ebbinghaus.py
           python3 -m unittest discover tests
 
       - name: Smoke test — server imports cleanly
@@ -41,16 +41,16 @@ jobs:
           "
 
       - name: CLI — save a memory
-        run: python3 engram.py save "CI test memory from GitHub Actions" --category ci --importance 5
+        run: python3 episoda.py save "CI test memory from GitHub Actions" --category ci --importance 5
 
       - name: CLI — search memories
-        run: python3 engram.py search "CI test"
+        run: python3 episoda.py search "CI test"
 
       - name: CLI — list memories
-        run: python3 engram.py list
+        run: python3 episoda.py list
 
       - name: CLI — stats
-        run: python3 engram.py stats
+        run: python3 episoda.py stats
 
       - name: Verify zero third-party dependencies
         run: |
@@ -68,20 +68,20 @@ jobs:
               return 'site-packages' not in loc
 
           third_party = set()
-          for fname in ('server.py', 'engram.py'):
+          for fname in ('server.py', 'episoda.py'):
               with open(fname) as f:
                   tree = ast.parse(f.read())
               for node in ast.walk(tree):
                   if isinstance(node, ast.Import):
                       for alias in node.names:
                           top = alias.name.split('.')[0]
-                          if top and not is_stdlib(top) and top not in ('server', 'engram'):
+                          if top and not is_stdlib(top) and top not in ('server', 'episoda'):
                               third_party.add(top)
                   elif isinstance(node, ast.ImportFrom):
                       # 'from datetime import timezone' -> module=datetime (stdlib)
                       if node.module:
                           top = node.module.split('.')[0]
-                          if top and not is_stdlib(top) and top not in ('server', 'engram'):
+                          if top and not is_stdlib(top) and top not in ('server', 'episoda'):
                               third_party.add(top)
 
           if third_party:

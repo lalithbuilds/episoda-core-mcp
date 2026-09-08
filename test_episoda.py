@@ -8,13 +8,13 @@ from unittest.mock import patch
 
 # Set the DB path to a temporary file before importing server
 temp_dir = tempfile.TemporaryDirectory()
-os.environ["ENGRAM_DB_PATH"] = str(Path(temp_dir.name) / "test_memory.db")
+os.environ["EPISODA_DB_PATH"] = str(Path(temp_dir.name) / "test_memory.db")
 
-import engram
+import episoda
 import server
 
 
-class TestEngramMCP(unittest.TestCase):
+class TestEpisodaMCP(unittest.TestCase):
     def setUp(self):
         self.conn = server.get_db()
         # Ensure fresh state for each test
@@ -167,7 +167,7 @@ class TestEngramMCP(unittest.TestCase):
         self.assertEqual(stats["details"]["project"], 1)
 
 
-class TestEngramCLI(unittest.TestCase):
+class TestEpisodaCLI(unittest.TestCase):
     def setUp(self):
         self.conn = server.get_db()
         self.conn.execute("DELETE FROM memories")
@@ -181,7 +181,7 @@ class TestEngramCLI(unittest.TestCase):
         args = type("Args", (), {"json": True})()
 
         with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
-            engram.cmd_stats(args)
+            episoda.cmd_stats(args)
             output = mock_stdout.getvalue()
 
         data = json.loads(output)
@@ -193,7 +193,7 @@ class TestEngramCLI(unittest.TestCase):
         args = type("Args", (), {"json": True, "query": ["hello"], "limit": 5})()
 
         with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
-            engram.cmd_search(args)
+            episoda.cmd_search(args)
             output = mock_stdout.getvalue()
 
         data = json.loads(output)
@@ -205,7 +205,7 @@ class TestEngramCLI(unittest.TestCase):
         args = type("Args", (), {"json": True})()
 
         with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
-            engram.cmd_list(args)
+            episoda.cmd_list(args)
             output = mock_stdout.getvalue()
 
         data = json.loads(output)
@@ -217,7 +217,7 @@ class TestEngramCLI(unittest.TestCase):
         args = type("Args", (), {"json": True, "limit": 3, "min_importance": 7})()
 
         with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
-            engram.cmd_recall(args)
+            episoda.cmd_recall(args)
             output = mock_stdout.getvalue()
 
         data = json.loads(output)
@@ -249,7 +249,7 @@ class TestEngramCLI(unittest.TestCase):
 
         export_file = Path(temp_dir.name) / "export.json"
         args_export = type("Args", (), {"file": str(export_file), "json": False})()
-        engram.cmd_export(args_export)
+        episoda.cmd_export(args_export)
 
         self.assertTrue(export_file.exists())
         with open(export_file) as f:
@@ -262,7 +262,7 @@ class TestEngramCLI(unittest.TestCase):
 
         # Import
         args_import = type("Args", (), {"file": str(export_file), "json": False})()
-        engram.cmd_import(args_import)
+        episoda.cmd_import(args_import)
 
         # Verify
         count = self.conn.execute("SELECT COUNT(*) FROM memories").fetchone()[0]

@@ -1,5 +1,5 @@
 """
-Unit tests for the engram list command.
+Unit tests for the episoda list command.
 Pure standard library unittest with zero external dependencies and zero hardcoded paths.
 """
 
@@ -14,7 +14,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from engram import cmd_list
+from episoda import cmd_list
 
 
 class TestListJson(unittest.TestCase):

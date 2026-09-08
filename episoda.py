@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-engram — CLI wrapper for the Engram local memory DB
+episoda — CLI wrapper for the Episoda local memory DB
 Usage:
-  engram save "your memory text" --category project --tags "tag1,tag2" --importance 8
-  engram search "query"
-  engram recall
-  engram list
-  engram stats
-  engram delete <id>
+  episoda save "your memory text" --category project --tags "tag1,tag2" --importance 8
+  episoda search "query"
+  episoda recall
+  episoda list
+  episoda stats
+  episoda delete <id>
 """
 
 import argparse
@@ -313,7 +313,7 @@ def cmd_tui(args):
         while True:
             stdscr.clear()
             h, w = stdscr.getmaxyx()
-            stdscr.addstr(0, 0, f"Engram TUI - {len(rows)} Memories - (UP/DOWN to scroll, 'q' to quit)", curses.A_REVERSE)
+            stdscr.addstr(0, 0, f"Episoda TUI - {len(rows)} Memories - (UP/DOWN to scroll, 'q' to quit)", curses.A_REVERSE)
 
             max_items = h - 2
             start = max(0, current_row - max_items // 2)
@@ -345,7 +345,7 @@ def cmd_tui(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="engram — Engram local memory CLI")
+    parser = argparse.ArgumentParser(description="episoda — Episoda local memory CLI")
     parser.add_argument("--json", action="store_true", help="Output results in JSON format")
     sub = parser.add_subparsers(dest="cmd")
 

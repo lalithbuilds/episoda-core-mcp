@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 🚀 Engram Alpha (Hardware AMX Vector & Graph Memory)
-    url: https://github.com/lalithbuilds/engram-alpha-mcp
-    about: Looking for semantic vector embeddings, Apple AMX acceleration, or Obsidian graph sync? Check out Engram Alpha.
+  - name: 🚀 episoda Alpha (Hardware AMX Vector & Graph Memory)
+    url: https://github.com/lalithbuilds/episoda-alpha-mcp
+    about: Looking for semantic vector embeddings, Apple AMX acceleration, or Obsidian graph sync? Check out episoda Alpha.
   - name: 💬 GitHub Discussions & Questions
-    url: https://github.com/lalithbuilds/engram-mcp/discussions
+    url: https://github.com/lalithbuilds/episoda-mcp/discussions
     about: Ask questions, share workflows, and discuss AI agent memory setups.
