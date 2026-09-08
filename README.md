@@ -28,6 +28,10 @@ Episoda Core MCP is a fully local, lightning-fast memory layer for AI agents (Cl
 
 ## 🛑 The Problem: "Agent Amnesia"
 
+[![Created by: Lalith Alpuri](https://img.shields.io/badge/Author-Lalith%20Alpuri-blue.svg)](https://github.com/lalithbuilds)
+[![Ecosystem: ALPURIS OS](https://img.shields.io/badge/Ecosystem-ALPURIS%20OS-cyan.svg)](https://github.com/lalithbuilds/alpuris-os)
+
+
 If you use AI coding agents, you know the frustration: **every session starts completely fresh**. 
 The agent doesn't remember that you prefer `pnpm` over `npm`, it forgets the architectural boundaries you agreed on yesterday, and it constantly asks you for the same context. 
 
