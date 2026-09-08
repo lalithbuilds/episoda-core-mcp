@@ -4,7 +4,7 @@
   <br>
   
   <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=24&duration=3000&pause=1000&color=ff79c6&center=true&vCenter=true&width=800&lines=Self-Healing+Local+Memory+Layer;Zero-Dependency+Python+Architecture;Full+FTS5+BM25+Keyword+Search;Ebbinghaus+Exponential+Decay" alt="Typing SVG" />
+    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=24&duration=3000&pause=1000&color=ff79c6&center=true&vCenter=true&width=800&lines=Self-Healing+Local+Memory+Layer;Zero-Dependency+Python+Architecture;Full+FTS5+BM25+Keyword+Search;Ebbinghaus+Inspired+Decay" alt="Typing SVG" />
   </a>
   
   <br>
@@ -42,7 +42,7 @@ Existing solutions try to fix this by bolting on massive Vector Databases (Postg
 ### Key Benefits
 
 *   **Stop Repeating Yourself:** Teach your agent your preferences, tech stack, and architectural decisions *once*. It will automatically recall them on the next boot.
-*   **Zero Infrastructure:** No databases to spin up. Episoda Core automatically creates a local SQLite file in your home directory (`~/episoda-core-mcp/memory.db`).
+*   **Zero Infrastructure:** No databases to spin up. Episoda Core automatically creates a local SQLite file in your home directory (`~/engram-mcp/memory.db`).
 *   **Zero API Costs:** Because it uses local BM25/FTS5 keyword indexing instead of semantic embeddings, you pay $0 in API credits for memory retrieval.
 *   **Total Data Privacy:** Your codebase context and architectural secrets never leave your local machine.
 
@@ -62,10 +62,10 @@ Episoda Core MCP is for developers who want **100% local, zero-dependency, zero-
 
 1.  **🐍 Zero Dependencies**
     Runs entirely on the Python Standard Library (`sqlite3`, `json`, `sys`, `hashlib`, `curses`). No `pip install` required.
-2.  **⏳ Ebbinghaus Auto-Decay (Forgetting Mechanism)**
+2.  **⏳ Ebbinghaus-Inspired Auto-Decay (Forgetting Mechanism)**
     Unlike other servers that hoard data forever, Episoda Core prevents stale context poisoning by employing a background auto-decay algorithm:
     *   Whenever an agent searches or retrieves a memory, it automatically bumps the `access_count` to signal importance.
-    *   Whenever the MCP server spins up, it applies an Ebbinghaus exponential time-decay curve: older, unaccessed memories gracefully fade in relevance, while frequently accessed ones are preserved of `importance`.
+    *   Whenever the MCP server spins up, it applies an Ebbinghaus-inspired time-decay algorithm: older, unaccessed memories gradually lose importance, while frequently accessed ones are preserved.
     Your agent's context window stays clean, relevant, and self-maintaining without manual intervention.
 3.  **🛡️ Enterprise-Grade Concurrency, Triggers & Backups**
     Designed for multi-agent workflows. Episoda Core implements SQLite Write-Ahead Logging (`PRAGMA journal_mode=WAL`) and strict connection timeouts. You can run Cursor and Claude Code simultaneously without triggering `database is locked` crashes. The system also performs daily automatic native SQLite backups (`memory.db.bak`) to protect against payload corruption. Data integrity is guaranteed via native SQLite AFTER INSERT/UPDATE/DELETE triggers that sync the FTS index, making desyncs mathematically impossible.
@@ -170,14 +170,12 @@ python3 episoda.py import backup.json
 
 We welcome contributions! Specifically, we are looking for help improving the terminal UI (TUI) and making FTS5 search even smarter.
 Check out our issues labeled `good first issue` to get started. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-We welcome contributions! Specifically, we are looking for help improving the terminal UI (TUI) and expanding the semantic search capabilities.
-Check out our issues labeled `good first issue` to get started. See [CONTRIBUTING.md](https://github.com/lalithbuilds/episoda-core-mcp/blob/main/CONTRIBUTING.md) for guidelines.
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-**"DB not found at ~/episoda-core-mcp/memory.db. Run the MCP server first."**
+**"DB not found at ~/engram-mcp/memory.db. Run the MCP server first."**
 - The SQLite database is created when the MCP server starts for the first time.
 - Make sure you're running `server.py` before using the CLI.
 - Check that the MCP server configuration points to the correct path.
