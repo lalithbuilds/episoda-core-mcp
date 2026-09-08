@@ -499,23 +499,70 @@ def handle(msg):
                 {
                     "jsonrpc": "2.0",
                     "id": mid_,
-                    "error": {"code": -32603, "message": f"[episoda-core-mcp] {e}"},
+                    "result": {
+                        "content": [{"type": "text", "text": f"ERR:{e}"}],
+                        "isError": True,
+                    },
                 }
             )
+    elif method in ("notifications/initialized", "notifications/cancelled"):
+        return None
+    elif method == "ping":
+        send({"jsonrpc": "2.0", "id": mid_, "result": {}})
+    elif mid_ is not None:
+        return {
+            "jsonrpc": "2.0",
+            "id": mid_,
+            "error": {"code": -32601, "message": f"Unknown method:{method}"},
+        }
 
 
 def main():
     sys.stderr.write("[episoda-core-mcp v1.0.0] Booting...\n")
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--diagnostics":
+            try:
+                conn = get_db()
+                row_count = conn.execute("SELECT COUNT(*) FROM memories").fetchone()[0]
+                integrity = conn.execute("PRAGMA integrity_check").fetchone()[0]
+                print(f"Database Path: {DB_PATH}")
+                print(f"Memory Count:  {row_count}")
+                print(f"Integrity:     {integrity}")
+            except Exception as e:
+                print(f"Diagnostics Error: {e}")
+            sys.exit(0)
+        else:
+            print("Usage: python3 server.py [--diagnostics]")
+            sys.exit(0)
+    get_db().close()
+
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8', newline='\n')
+    if hasattr(sys.stdin, 'reconfigure'):
+        sys.stdin.reconfigure(encoding='utf-8', newline='\n', errors='replace')
+        
     for line in sys.stdin:
-        line = line.strip()
-        if not line:
-            continue
         try:
-            msg = json.loads(line)
+            req = json.loads(line)
+            if not isinstance(req, dict) or "method" not in req:
+                err_res = {"jsonrpc": "2.0", "id": req.get("id") if isinstance(req, dict) else None, "error": {"code": -32600, "message": "Invalid Request"}}
+                sys.stdout.write(json.dumps(err_res) + "\n")
+                sys.stdout.flush()
+                continue
+                
+            res = handle(req)
+            if res:
+                sys.stdout.write(json.dumps(res) + "\n")
+                sys.stdout.flush()
         except json.JSONDecodeError:
-            continue
-        if handle(msg) is None:
-            break
+            err_res = {"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": "Parse error"}}
+            sys.stdout.write(json.dumps(err_res) + "\n")
+            sys.stdout.flush()
+        except Exception as e:
+            sys.stderr.write(f"[episoda-core-mcp] {e}\n")
+            err_res = {"jsonrpc": "2.0", "id": None, "error": {"code": -32603, "message": "Internal error"}}
+            sys.stdout.write(json.dumps(err_res) + "\n")
+            sys.stdout.flush()
 
 
 if __name__ == "__main__":
