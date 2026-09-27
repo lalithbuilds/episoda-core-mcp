@@ -58,6 +58,27 @@ Episoda Core MCP is built for developers searching for **zero-dependency MCP ser
 
 Use Episoda Core MCP when you want a small, auditable memory server that works with standard-library Python and does not require Docker, cloud APIs, vector databases, or paid embedding services.
 
+## 60-Second Proof Path
+
+Episoda Core MCP is meant to prove its value quickly: no install ceremony, no cloud setup, and no background database service.
+
+```bash
+python3 engram.py save "We use pnpm for frontend package management." --category project --importance 8
+python3 engram.py search "frontend package manager"
+python3 engram.py stats
+python3 -m pytest -q
+```
+
+Expected local baseline: **18 tests passing**.
+
+A good demo should show three things:
+
+- memory can be saved locally
+- memory can be searched immediately through SQLite FTS5
+- the whole project remains dependency-light and testable
+
+This is the repo's strongest marketing angle: it is boring in the best way, because the value is obvious and the operational risk is low.
+
 ## Why This Exists (Vs The Ecosystem)
 
 The AI agent memory ecosystem (like **Letta/MemGPT** or **AgentMemory**) is currently dominated by heavy frameworks requiring Postgres, pgvector, 15+ dependencies, and cloud embedding models. 
