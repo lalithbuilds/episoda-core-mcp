@@ -9,3 +9,5 @@ __pycache__/
 *.sqlite3
 benchmark/data/
 longmemeval_results.json
+*.db.bak
+*.bak
