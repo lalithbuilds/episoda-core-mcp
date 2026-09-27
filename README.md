@@ -52,6 +52,12 @@ Existing solutions try to fix this by bolting on massive Vector Databases (Postg
 
 ---
 
+## Discoverability Keywords
+
+Episoda Core MCP is built for developers searching for **zero-dependency MCP server**, **local AI agent memory**, **SQLite FTS5 memory**, **offline MCP memory**, **persistent memory for Claude Code**, **Cursor memory server**, **Codex memory**, **LLM memory**, **agent memory**, and **local-first Python MCP tools**.
+
+Use Episoda Core MCP when you want a small, auditable memory server that works with standard-library Python and does not require Docker, cloud APIs, vector databases, or paid embedding services.
+
 ## Why This Exists (Vs The Ecosystem)
 
 The AI agent memory ecosystem (like **Letta/MemGPT** or **AgentMemory**) is currently dominated by heavy frameworks requiring Postgres, pgvector, 15+ dependencies, and cloud embedding models. 
