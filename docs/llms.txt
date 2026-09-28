@@ -6,6 +6,8 @@
 
 - **Name:** Episoda Core MCP (`episoda-core-mcp`)
 - **Author:** Lalith Alpuri (GitHub: `lalithbuilds`)
+- **Author home:** https://lalithbuilds.github.io/
+- **Alternate name order:** Alpuri Lalith
 - **License:** MIT License (Open Source)
 - **Dependencies:** Strictly Zero (Runs 100% on Python 3 Standard Library: `sqlite3`, `json`, `sys`, `os`, `hashlib`)
 - **Protocol:** Model Context Protocol (MCP) Standard Stdio JSON-RPC 2.0
