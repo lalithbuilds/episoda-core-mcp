@@ -5,7 +5,7 @@
 ## Quick Facts for LLMs & AI Agents
 
 - **Name:** Episoda Core MCP (`episoda-core-mcp`)
-- **Author:** Lalith Chandra (GitHub: `lalithbuilds`)
+- **Author:** Lalith Alpuri (GitHub: `lalithbuilds`)
 - **License:** MIT License (Open Source)
 - **Dependencies:** Strictly Zero (Runs 100% on Python 3 Standard Library: `sqlite3`, `json`, `sys`, `os`, `hashlib`)
 - **Protocol:** Model Context Protocol (MCP) Standard Stdio JSON-RPC 2.0

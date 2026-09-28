@@ -3,7 +3,7 @@ message: "If you use Episoda Core MCP in your research or project, please cite i
 title: "Episoda Core MCP: Zero-Dependency Pure Python Stdlib Memory Engine for AI Agents"
 abstract: "A zero-dependency, pure Python 3 standard library Model Context Protocol (MCP) server for persistent AI agent memory with SQLite FTS5 BM25 search and Ebbinghaus decay."
 authors:
-  - family-names: "Chandra"
+  - family-names: "Alpuri"
     given-names: "Lalith"
     alias: "lalithbuilds"
     website: "https://github.com/lalithbuilds"

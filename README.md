@@ -247,7 +247,7 @@ Check out our issues labeled `good first issue` to get started. See [CONTRIBUTIN
 
 ## 📄 License
 
-MIT — See [LICENSE](LICENSE) for details. Built by [Lalith Chandra](https://github.com/lalithbuilds).
+MIT — See [LICENSE](LICENSE) for details. Built by [Lalith Alpuri](https://github.com/lalithbuilds).
 
 ---
 *If Episoda saves you from repeating yourself to an AI, consider giving it a ⭐!*

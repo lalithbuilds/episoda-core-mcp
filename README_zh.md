@@ -46,4 +46,4 @@ claude mcp add episoda python3 /你的本地路径/episoda-core-mcp/server.py
 ---
 
 ## 📜 开源协议
-MIT 开源许可证 · 由 [Lalith Chandra](https://github.com/lalithbuilds) 研发构建。
+MIT 开源许可证 · 由 [Lalith Alpuri](https://github.com/lalithbuilds) 研发构建。
