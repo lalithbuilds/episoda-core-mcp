@@ -7,6 +7,7 @@
   <title>Episoda Core MCP — Zero-Dependency Persistent Memory for AI Agents</title>
   <meta name="description" content="Zero-dependency Model Context Protocol (MCP) server for persistent AI agent memory. Pure Python 3 standard library, SQLite FTS5 BM25 search, zero cloud, zero Docker.">
   <meta name="keywords" content="mcp, model context protocol, claude code memory, cursor mcp, windsurf memory, zero dependency mcp, sqlite fts5, persistent agent memory">
+  <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="author" content="Lalith Chandra">
   <link rel="canonical" href="https://lalithbuilds.github.io/episoda-core-mcp/">
   <link rel="llms-txt" href="https://lalithbuilds.github.io/episoda-core-mcp/llms.txt">
@@ -37,6 +38,19 @@
     "description": "Zero-dependency Model Context Protocol (MCP) server for persistent AI agent memory using pure Python standard library and SQLite FTS5.",
     "license": "https://opensource.org/licenses/MIT",
     "codeRepository": "https://github.com/lalithbuilds/episoda-core-mcp"
+    ,"keywords": "MCP server, local AI memory, SQLite FTS5, Claude Code memory, Cursor memory, offline agent memory, Python MCP"
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {"@type":"Question","name":"What is Episoda Core MCP?","acceptedAnswer":{"@type":"Answer","text":"Episoda Core MCP is a zero-dependency local memory server for AI coding agents. It speaks the Model Context Protocol over stdio and stores persistent context in SQLite FTS5."}},
+      {"@type":"Question","name":"Does Episoda Core MCP require a cloud API or Docker?","acceptedAnswer":{"@type":"Answer","text":"No. Episoda Core MCP runs locally with Python 3 standard-library modules and SQLite. It does not require a cloud API, vector database, Docker, or paid embeddings."}},
+      {"@type":"Question","name":"Which AI clients can use Episoda Core MCP?","acceptedAnswer":{"@type":"Answer","text":"Any MCP-compatible client can connect to it. The repository documents Claude Code, Claude Desktop, Cursor, Windsurf, Zed, and other stdio MCP clients."}}
+    ]
   }
   </script>
 
@@ -56,14 +70,6 @@
   <!-- Plausible Analytics (privacy-friendly) -->
   <script defer data-domain="lalithbuilds.github.io" src="https://plausible.io/js/script.js"></script>
 
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
-  </script>
 </head>
 <body>
   <div class="container">
@@ -76,6 +82,16 @@
     </div>
 
     <a href="https://github.com/lalithbuilds/episoda-core-mcp" class="btn">View on GitHub</a>
+
+    <section aria-labelledby="faq" style="margin-top: 2rem;">
+      <h2 id="faq">FAQ: local MCP memory</h2>
+      <h3>What is Episoda Core MCP?</h3>
+      <p>It is a zero-dependency local memory server for AI coding agents. It uses the Model Context Protocol over stdio and SQLite FTS5 for persistent keyword retrieval.</p>
+      <h3>Does it need cloud APIs, Docker, or a vector database?</h3>
+      <p>No. It runs with Python 3 standard-library modules and SQLite, so project context can remain on the developer's machine.</p>
+      <h3>Which clients can connect?</h3>
+      <p>Any MCP-compatible client can use it, including Claude Code, Claude Desktop, Cursor, Windsurf, and Zed.</p>
+    </section>
 
     <h2 style="margin-top: 2rem;">⚡ Quickstart (Claude Code)</h2>
     <pre><code>claude mcp add episoda python3 /path/to/episoda-core-mcp/server.py</code></pre>

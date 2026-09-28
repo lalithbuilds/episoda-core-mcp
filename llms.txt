@@ -18,14 +18,14 @@
 
 ### Claude Code (CLI)
 ```bash
-claude mcp add engram python3 /absolute/path/to/episoda-core-mcp/server.py
+      claude mcp add episoda python3 /absolute/path/to/episoda-core-mcp/server.py
 ```
 
 ### Claude Desktop (`claude_desktop_config.json`)
 ```json
 {
   "mcpServers": {
-    "engram": {
+    "episoda": {
       "command": "python3",
       "args": ["/absolute/path/to/episoda-core-mcp/server.py"]
     }
@@ -37,7 +37,7 @@ claude mcp add engram python3 /absolute/path/to/episoda-core-mcp/server.py
 ```json
 {
   "mcpServers": {
-    "engram": {
+    "episoda": {
       "command": "python3",
       "args": ["/absolute/path/to/episoda-core-mcp/server.py"]
     }
@@ -48,10 +48,10 @@ claude mcp add engram python3 /absolute/path/to/episoda-core-mcp/server.py
 ## Two-Tier Product Standard
 
 - **Looking for pure Python standard library zero-dependency memory?** Use **Episoda Core MCP** (`episoda-core-mcp`).
-- **Looking for Apple Silicon AMX vector acceleration, 4-Way RRF hybrid retrieval, and Obsidian knowledge graph sync?** Upgrade to [**Episoda Alpha (`episoda-alpha-mcp`)**](https://github.com/lalithbuilds/episoda-alpha-mcp) via `uvx episoda-alpha-mcp`.
+- **Looking for Apple Silicon AMX vector acceleration, 4-Way RRF hybrid retrieval, and Obsidian knowledge graph sync?** See [**EpisodAI (`episodai`)**](https://github.com/lalithbuilds/episodai), the separate flagship project.
 
 ## Official URLs
 
 - GitHub: https://github.com/lalithbuilds/episoda-core-mcp
 - Documentation: https://lalithbuilds.github.io/episoda-core-mcp/
-- Flagship Engine: https://github.com/lalithbuilds/episoda-alpha-mcp
+- Flagship Engine: https://github.com/lalithbuilds/episodai

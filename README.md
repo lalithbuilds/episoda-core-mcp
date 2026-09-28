@@ -1,3 +1,11 @@
+# Episoda Core MCP — Zero-Dependency Local Memory for AI Agents
+
+Episoda Core MCP is a **local, offline memory server for AI coding agents**. It implements the **Model Context Protocol (MCP)** over stdio and stores persistent agent context in **SQLite FTS5** with BM25 keyword search. It runs on Python 3 with no pip dependencies, cloud account, vector database, or Docker service.
+
+Use it when you are searching for a **zero-dependency MCP server**, **SQLite memory for Claude Code or Cursor**, **offline persistent memory for LLM agents**, or a small, auditable alternative to hosted vector memory. The canonical project name is **Episoda Core MCP** and the repository is [`lalithbuilds/episoda-core-mcp`](https://github.com/lalithbuilds/episoda-core-mcp).
+
+> Episoda Core is the standard-library edition. For semantic retrieval, graph memory, Obsidian synchronization, and Apple Silicon acceleration, see [EpisodAI](https://github.com/lalithbuilds/episodai), the separate flagship project.
+
 <div align="center">
   <img src="https://capsule-render.vercel.app/api?type=cylinder&color=gradient&customColorList=1,2&height=180&section=header&text=Episoda%20Core%20MCP&fontSize=75&fontAlignY=45&animation=scaleIn&fontColor=ffffff&desc=Self-Healing%20Agent%20Memory&descAlignY=65&descAlign=62" width="100%"/>
   
