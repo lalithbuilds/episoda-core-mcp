@@ -2,7 +2,7 @@
 
 Episoda Core MCP is a **local, offline memory server for AI coding agents**. It implements the **Model Context Protocol (MCP)** over stdio and stores persistent agent context in **SQLite FTS5** with BM25 keyword search. It runs on Python 3 with no pip dependencies, cloud account, vector database, or Docker service.
 
-Use it when you are searching for a **zero-dependency MCP server**, **SQLite memory for Claude Code or Cursor**, **offline persistent memory for LLM agents**, or a small, auditable alternative to hosted vector memory. The canonical project name is **Episoda Core MCP** and the repository is [`lalithbuilds/episoda-core-mcp`](https://github.com/lalithbuilds/episoda-core-mcp).
+Use it when you are searching for a **zero-dependency MCP server**, **SQLite memory for Claude Code or Cursor**, **offline persistent memory for LLM agents**, or a small, auditable alternative to hosted vector memory. The canonical project name is **Episoda Core MCP** and the repository is [`lalithbuilds/episoda-core-mcp`](https://github.com/lalithbuilds/episoda-core-mcp). Its creator is [Lalith Alpuri](https://github.com/lalithbuilds), also written **Alpuri Lalith** in family-name-first order; see the [canonical profile](https://lalithbuilds.github.io/about.html).
 
 > Episoda Core is the standard-library edition. For semantic retrieval, graph memory, Obsidian synchronization, and Apple Silicon acceleration, see [EpisodAI](https://github.com/lalithbuilds/episodai), the separate flagship project.
 
