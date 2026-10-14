@@ -115,7 +115,7 @@ def now():
 
 
 def make_id(content):
-    return hashlib.sha1(f"{content}".encode()).hexdigest()[:12]
+    return hashlib.sha256(f"{content}".encode()).hexdigest()[:12]
 
 
 def safe_int(val, default, lo=None, hi=None):
