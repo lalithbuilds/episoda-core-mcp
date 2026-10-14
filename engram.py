@@ -252,6 +252,9 @@ def cmd_import(args):
     conn.execute("BEGIN TRANSACTION")
     imported = 0
     import re
+
+    records_to_insert = []
+
     for r in data:
         content = str(r.get("content", ""))[:8000]
         try:
@@ -266,18 +269,38 @@ def cmd_import(args):
         updated = safe_date(r.get("updated_at", server.now()))
         
         try:
-            conn.execute(
-                """INSERT INTO memories (id,category,content,tags,importance,created_at,updated_at,access_count,last_accessed_at)
-                   VALUES(?,?,?,?,?,?,?,?,?)
-                   ON CONFLICT(id) DO UPDATE SET
-                   category=excluded.category, content=excluded.content, tags=excluded.tags, importance=excluded.importance, updated_at=excluded.updated_at, last_accessed_at=excluded.last_accessed_at, access_count=excluded.access_count""",
-                (r["id"], r.get("category", "general"), content, r.get("tags", ""), imp, created, updated, r.get("access_count", 0), r.get("last_accessed_at", "")),
-            )
+            records_to_insert.append((
+                r["id"],
+                r.get("category", "general"),
+                content,
+                r.get("tags", ""),
+                imp,
+                created,
+                updated,
+                r.get("access_count", 0),
+                r.get("last_accessed_at", "")
+            ))
             imported += 1
         except KeyError as e:
             print(f"Skipping malformed memory (missing {e})")
         except Exception as e:
             print(f"Error importing memory: {e}")
+
+    if records_to_insert:
+        try:
+            conn.executemany(
+                """INSERT INTO memories (id,category,content,tags,importance,created_at,updated_at,access_count,last_accessed_at)
+                   VALUES(?,?,?,?,?,?,?,?,?)
+                   ON CONFLICT(id) DO UPDATE SET
+                   category=excluded.category, content=excluded.content, tags=excluded.tags, importance=excluded.importance, updated_at=excluded.updated_at, last_accessed_at=excluded.last_accessed_at, access_count=excluded.access_count""",
+                records_to_insert
+            )
+        except Exception as e:
+            print(f"Error importing memories: {e}")
+            # Rollback to avoid partial import
+            conn.rollback()
+            conn.close()
+            return
 
     conn.commit()
     conn.close()
