@@ -268,5 +268,26 @@ class TestEngramCLI(unittest.TestCase):
         count = self.conn.execute("SELECT COUNT(*) FROM memories").fetchone()[0]
         self.assertGreaterEqual(count, 2)
 
+class TestServerUtils(unittest.TestCase):
+    def test_make_id_basic(self):
+        # hashlib.sha1(b"test").hexdigest()[:12] is a94a8fe5ccb1
+        self.assertEqual(server.make_id("test"), "a94a8fe5ccb1")
+
+    def test_make_id_empty_string(self):
+        # hashlib.sha1(b"").hexdigest()[:12] is da39a3ee5e6b
+        self.assertEqual(server.make_id(""), "da39a3ee5e6b")
+
+    def test_make_id_non_string(self):
+        # hashlib.sha1(b"123").hexdigest()[:12] is 40bd00156308
+        self.assertEqual(server.make_id(123), "40bd00156308")
+
+    def test_make_id_length(self):
+        self.assertEqual(len(server.make_id("some long string " * 100)), 12)
+
+    def test_make_id_deterministic(self):
+        id1 = server.make_id("consistent input")
+        id2 = server.make_id("consistent input")
+        self.assertEqual(id1, id2)
+
 if __name__ == "__main__":
     unittest.main()
