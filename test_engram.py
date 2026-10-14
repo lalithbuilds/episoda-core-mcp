@@ -1,6 +1,7 @@
 import io
 import json
 import os
+import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
@@ -23,6 +24,53 @@ class TestEngramMCP(unittest.TestCase):
 
     def tearDown(self):
         self.conn.close()
+
+    def test_exp_fallback(self):
+        # Test the EXP function fallback logic in get_db
+        class TestConn(sqlite3.Connection):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.exp_func_created = False
+                self.exp_func = None
+
+            def execute(self, sql, *args):
+                if sql == "SELECT EXP(1)":
+                    raise sqlite3.OperationalError("no such function: EXP")
+                return super().execute(sql, *args)
+
+            def create_function(self, name, num_args, func):
+                if name == "EXP":
+                    self.exp_func_created = True
+                    self.exp_func = func
+                return super().create_function(name, num_args, func)
+
+        original_connect = sqlite3.connect
+
+        def my_connect(*args, **kwargs):
+            kwargs["factory"] = TestConn
+            return original_connect(*args, **kwargs)
+
+        original_schema_initialized = server._SCHEMA_INITIALIZED
+        try:
+            with patch('sqlite3.connect', side_effect=my_connect):
+                # Reset the global so it forces get_db to run initialization logic
+                server._SCHEMA_INITIALIZED = False
+
+                conn = server.get_db()
+
+                self.assertTrue(conn.exp_func_created)
+                self.assertIsNotNone(conn.exp_func)
+
+                # Test the fallback exp function behavior
+                import math
+                self.assertAlmostEqual(conn.exp_func(1), math.exp(1))
+                self.assertAlmostEqual(conn.exp_func(2.5), math.exp(2.5))
+                self.assertIsNone(conn.exp_func(None))
+                self.assertIsNone(conn.exp_func("invalid_string"))
+
+                conn.close()
+        finally:
+            server._SCHEMA_INITIALIZED = original_schema_initialized
 
     def test_schema_initialized(self):
         # Verify tables exist
