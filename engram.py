@@ -252,15 +252,17 @@ def cmd_import(args):
     conn.execute("BEGIN TRANSACTION")
     imported = 0
     import re
+    date_regex = re.compile(r"^\d{4}-\d{2}-\d{2}")
+
+    def safe_date(d):
+        return str(d) if date_regex.match(str(d)) else server.now()
+
     for r in data:
         content = str(r.get("content", ""))[:8000]
         try:
             imp = max(1, min(10, int(r.get("importance", 5) or 5)))
         except (ValueError, TypeError):
             imp = 5
-            
-        def safe_date(d):
-            return str(d) if re.match(r"^\d{4}-\d{2}-\d{2}", str(d)) else server.now()
             
         created = safe_date(r.get("created_at", server.now()))
         updated = safe_date(r.get("updated_at", server.now()))
