@@ -34,8 +34,6 @@ def make_id(content):
 
 
 def cmd_save(args):
-    import json
-    import server
     content = " ".join(args.content)
     importance = max(1, min(10, args.importance))
     res = server.t_save({
@@ -51,7 +49,6 @@ def cmd_save(args):
         
     if "error" in res:
         print(f"Error: {res['error']}")
-        import sys
         sys.exit(1)
         
     if "warnings" in res and res["warnings"]:
@@ -206,7 +203,6 @@ def cmd_stats(args):
 
 
 def cmd_delete(args):
-    import sys
     conn = get_db()
     cursor = conn.execute("DELETE FROM memories WHERE id=?", (args.id,))
     if cursor.rowcount == 0:
@@ -229,7 +225,6 @@ def cmd_export(args):
         print(f"Exported {len(data)} memories to {args.file}")
     except Exception as e:
         print(f"Failed to export: {e}")
-        import sys
         sys.exit(1)
 
 
@@ -239,19 +234,16 @@ def cmd_import(args):
             data = json.load(f)
     except Exception as e:
         print(f"Failed to load file: {e}")
-        import sys
         sys.exit(1)
 
     if not isinstance(data, list):
         print("Invalid format: expected a JSON array of memories.")
-        import sys
         sys.exit(1)
 
     
     conn = server.get_db()
     conn.execute("BEGIN TRANSACTION")
     imported = 0
-    import re
     for r in data:
         content = str(r.get("content", ""))[:8000]
         try:
@@ -291,7 +283,6 @@ def cmd_tui(args):
         print("curses module not available on this platform.")
         return
 
-    import sys
     if not sys.stdout.isatty():
         print("TUI requires a real terminal.")
         return
