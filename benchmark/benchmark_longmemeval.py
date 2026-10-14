@@ -33,6 +33,14 @@ def load_longmemeval(dataset_path):
 def ingest_memory(conn, item):
     sessions = item.get("haystack_sessions", [])
 
+    memories_params = []
+    fts_delete_params = []
+    fts_insert_params = []
+
+    current_time = now()
+
+    seen_mids = set()
+
     for session in sessions:
         for turn in session:
             content = turn.get("content", "")
@@ -40,19 +48,36 @@ def ingest_memory(conn, item):
                 continue
 
             mid = server.make_id(content)
-            conn.execute(
-                """INSERT INTO memories (id, category, content, tags, importance, created_at, updated_at, access_count, last_accessed_at)
-                   VALUES(?, ?, ?, ?, ?, ?, ?, 0, ?)
-                   ON CONFLICT(id) DO UPDATE SET
-                   category=excluded.category, importance=excluded.importance, updated_at=excluded.updated_at, last_accessed_at=excluded.last_accessed_at""",
-                (mid, "history", content, "longmemeval", 7, now(), now(), now()),
+            memories_params.append(
+                (mid, "history", content, "longmemeval", 7, current_time, current_time, current_time)
             )
 
-            # Sync FTS index
-            conn.execute("DELETE FROM memories_fts WHERE id=?", (mid,))
-            conn.execute(
-                "INSERT INTO memories_fts (id, content) VALUES (?, ?)", (mid, content)
-            )
+            # Keep only the last content for each mid to avoid duplicate inserts
+            if mid not in seen_mids:
+                fts_delete_params.append((mid,))
+                fts_insert_params.append((mid, content))
+                seen_mids.add(mid)
+            else:
+                # Update the content to the latest one
+                for i, param in enumerate(fts_insert_params):
+                    if param[0] == mid:
+                        fts_insert_params[i] = (mid, content)
+                        break
+
+    if memories_params:
+        conn.executemany(
+            """INSERT INTO memories (id, category, content, tags, importance, created_at, updated_at, access_count, last_accessed_at)
+               VALUES(?, ?, ?, ?, ?, ?, ?, 0, ?)
+               ON CONFLICT(id) DO UPDATE SET
+               category=excluded.category, importance=excluded.importance, updated_at=excluded.updated_at, last_accessed_at=excluded.last_accessed_at""",
+            memories_params,
+        )
+
+        # Sync FTS index
+        conn.executemany("DELETE FROM memories_fts WHERE id=?", fts_delete_params)
+        conn.executemany(
+            "INSERT INTO memories_fts (id, content) VALUES (?, ?)", fts_insert_params
+        )
 
     conn.commit()
 
