@@ -59,15 +59,19 @@ def get_db(read_only=False):
     except sqlite3.OperationalError:
         try:
             def _safe_exp(x):
-                if x is None: return None
-                try: return math.exp(float(x))
-                except Exception: return None
+                if x is None:
+                    return None
+                try:
+                    return math.exp(float(x))
+                except Exception:
+                    return None
             conn.create_function("EXP", 1, _safe_exp)
         except Exception:
             pass
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL;")
-    if not DB_PATH.is_symlink(): os.chmod(DB_PATH, 0o600)
+    if not DB_PATH.is_symlink():
+        os.chmod(DB_PATH, 0o600)
     conn.execute("PRAGMA synchronous=NORMAL;")
     if not _SCHEMA_INITIALIZED:
         conn.executescript(SCHEMA)
@@ -103,7 +107,8 @@ def get_db(read_only=False):
                 backup_conn.close()
                 # Update mtime on the backup to track correctly
                 backup_path.touch()
-                if not backup_path.is_symlink(): os.chmod(backup_path, 0o600)
+                if not backup_path.is_symlink():
+                    os.chmod(backup_path, 0o600)
             except Exception as e:
                 sys.stderr.write(f"[episoda-backup] Backup failed: {e}\n")
 
