@@ -13,7 +13,6 @@ Usage:
 import argparse
 import json
 import datetime
-import hashlib
 import re
 import sys
 
@@ -27,10 +26,6 @@ def get_db():
 
 def now():
     return datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None).isoformat()
-
-
-def make_id(content):
-    return hashlib.sha1(f"{content}".encode()).hexdigest()[:12]
 
 
 def cmd_save(args):
