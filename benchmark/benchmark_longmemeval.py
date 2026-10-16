@@ -13,10 +13,12 @@ from pathlib import Path
 # Import Engram's core functions
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-# Need to set DB_PATH before importing server so it creates isolated benchmark DB
-db_path = Path.home() / "engram-benchmarks" / "memory.db"
-db_path.parent.mkdir(parents=True, exist_ok=True)
-os.environ["ENGRAM_DB_PATH"] = str(db_path)
+# Isolate the benchmark DB only when this file is executed directly.
+# Importing the module from tests must not redirect ENGRAM_DB_PATH.
+if __name__ == "__main__":
+    _bench_db = Path.home() / "engram-benchmarks" / "memory.db"
+    _bench_db.parent.mkdir(parents=True, exist_ok=True)
+    os.environ["ENGRAM_DB_PATH"] = str(_bench_db)
 
 import server  # Engram's server module
 
@@ -32,27 +34,48 @@ def load_longmemeval(dataset_path):
 
 def ingest_memory(conn, item):
     sessions = item.get("haystack_sessions", [])
-
+    current_time = now()
+    # make_id is a content hash, so one id is one content. Keep the first
+    # row for each id. Scanning the batch to overwrite "later" content is
+    # O(n^2) and, on a hash collision, writes a different string into FTS
+    # than the memories table keeps (ON CONFLICT does not update content).
+    by_id = {}
     for session in sessions:
         for turn in session:
             content = turn.get("content", "")
             if not content:
                 continue
-
             mid = server.make_id(content)
-            conn.execute(
-                """INSERT INTO memories (id, category, content, tags, importance, created_at, updated_at, access_count, last_accessed_at)
-                   VALUES(?, ?, ?, ?, ?, ?, ?, 0, ?)
-                   ON CONFLICT(id) DO UPDATE SET
-                   category=excluded.category, importance=excluded.importance, updated_at=excluded.updated_at, last_accessed_at=excluded.last_accessed_at""",
-                (mid, "history", content, "longmemeval", 7, now(), now(), now()),
+            if mid in by_id:
+                continue
+            by_id[mid] = (
+                mid,
+                "history",
+                content,
+                "longmemeval",
+                7,
+                current_time,
+                current_time,
+                current_time,
             )
 
-            # Sync FTS index
-            conn.execute("DELETE FROM memories_fts WHERE id=?", (mid,))
-            conn.execute(
-                "INSERT INTO memories_fts (id, content) VALUES (?, ?)", (mid, content)
-            )
+    params = list(by_id.values())
+    if params:
+        conn.executemany(
+            """INSERT INTO memories (id, category, content, tags, importance, created_at, updated_at, access_count, last_accessed_at)
+               VALUES(?, ?, ?, ?, ?, ?, ?, 0, ?)
+               ON CONFLICT(id) DO UPDATE SET
+               category=excluded.category, importance=excluded.importance, updated_at=excluded.updated_at, last_accessed_at=excluded.last_accessed_at""",
+            params,
+        )
+
+        # Triggers already mirror inserts. Replace any prior FTS row so the
+        # indexed content matches the memories row, including ON CONFLICT.
+        conn.executemany("DELETE FROM memories_fts WHERE id=?", [(row[0],) for row in params])
+        conn.executemany(
+            "INSERT INTO memories_fts (id, content) VALUES (?, ?)",
+            [(row[0], row[2]) for row in params],
+        )
 
     conn.commit()
 
