@@ -1,2 +1,4 @@
+target-version = "py38"
+
 [lint]
 ignore = ["BLE001"]

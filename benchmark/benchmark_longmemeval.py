@@ -6,6 +6,7 @@ Measures retrieval accuracy (R@5, R@10, etc.)
 
 import json
 import os
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -83,14 +84,12 @@ def ingest_memory(conn, item):
 def search_memory(conn, query, limit=5):
     if not query.isascii():
         rows = conn.execute(
-            "SELECT id, category, content, importance FROM memories WHERE content LIKE ? LIMIT ?",
-            (f"%{query}%", limit),
+            "SELECT id, category, content, importance FROM memories WHERE content LIKE ? ESCAPE '\\' LIMIT ?",
+            (server.like_contains(query), limit),
         ).fetchall()
     else:
         try:
             # Extract alphanumeric words to avoid FTS5 syntax errors with punctuation
-            import re
-
             words = [w for w in re.findall(r"\w+", query) if len(w) > 2]
             fts_query = " OR ".join(words) if words else query
 
@@ -105,8 +104,8 @@ def search_memory(conn, query, limit=5):
         except Exception as e:
             print(f"Exception in FTS: {e}")
             rows = conn.execute(
-                "SELECT id, category, content, importance FROM memories WHERE content LIKE ? LIMIT ?",
-                (f"%{query}%", limit),
+                "SELECT id, category, content, importance FROM memories WHERE content LIKE ? ESCAPE '\\' LIMIT ?",
+                (server.like_contains(query), limit),
             ).fetchall()
 
     return [{"id": r["id"], "content": r["content"]} for r in rows]
@@ -126,12 +125,24 @@ def evaluate_single_item(conn, item):
     if is_unanswerable:
         return False, True
 
-    import re
-
-    # Check if answer text appears in retrieved results using precise word boundaries
-    pattern = r"\b" + re.escape(str(answer).lower()) + r"\b"
-    correct = any(re.search(pattern, str(text).lower()) for text in result_texts)
+    correct = any(answer_in_text(answer, text) for text in result_texts)
     return correct, False
+
+
+def answer_in_text(answer, text):
+    """Return True when answer occurs in text.
+
+    Word boundaries keep '90' from matching inside '190'. Answers that
+    start or end with punctuation (for example '-O3 -ffast-math') have
+    no word boundary there, so those fall back to a literal substring.
+    """
+    needle = str(answer).lower()
+    haystack = str(text).lower()
+    if needle == "":
+        return False
+    if needle[0].isalnum() and needle[-1].isalnum():
+        return re.search(r"\b" + re.escape(needle) + r"\b", haystack) is not None
+    return needle in haystack
 
 
 def run_benchmark(dataset_path, output_file="longmemeval_results.json"):

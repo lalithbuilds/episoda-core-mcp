@@ -11,12 +11,25 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-db_path = Path.home() / "engram-benchmarks" / "memory.db"
-db_path.parent.mkdir(parents=True, exist_ok=True)
-os.environ["ENGRAM_DB_PATH"] = str(db_path)
+# Isolate the benchmark DB only when this file is executed directly.
+# Importing the module from tests must not redirect ENGRAM_DB_PATH.
+if __name__ == "__main__":
+    _bench_db = Path.home() / "engram-benchmarks" / "memory.db"
+    _bench_db.parent.mkdir(parents=True, exist_ok=True)
+    os.environ["ENGRAM_DB_PATH"] = str(_bench_db)
 
 
 import server
+
+
+def insert_scored_memory(conn, content, category="test", importance=7):
+    """Insert one memory. FTS is maintained by the schema triggers."""
+    mid = server.make_id(content)
+    conn.execute(
+        "INSERT INTO memories (id, category, content, importance, created_at, updated_at, access_count, last_accessed_at) VALUES (?, ?, ?, ?, ?, ?, 0, ?)",
+        (mid, category, content, importance, server.now(), server.now(), server.now()),
+    )
+    return mid
 
 
 def benchmark_fts5_vs_like():
@@ -33,14 +46,7 @@ def benchmark_fts5_vs_like():
 
     for i, query in enumerate(test_queries):
         content = f"Memory {i}: {query} with additional context and details"
-        mid = server.make_id(content)
-        conn.execute(
-            "INSERT INTO memories (id, category, content, importance, created_at, updated_at, access_count, last_accessed_at) VALUES (?, ?, ?, ?, ?, ?, 0, ?)",
-            (mid, "test", content, 7, server.now(), server.now(), server.now()),
-        )
-        conn.execute(
-            "INSERT INTO memories_fts (id, content) VALUES (?, ?)", (mid, content)
-        )
+        insert_scored_memory(conn, content)
 
     conn.commit()
 
