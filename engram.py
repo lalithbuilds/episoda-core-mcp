@@ -228,9 +228,15 @@ def cmd_export(args):
         sys.exit(1)
 
 
+_IMPORT_SQL = """INSERT INTO memories (id,category,content,tags,importance,created_at,updated_at,access_count,last_accessed_at)
+   VALUES(?,?,?,?,?,?,?,?,?)
+   ON CONFLICT(id) DO UPDATE SET
+   category=excluded.category, content=excluded.content, tags=excluded.tags, importance=excluded.importance, updated_at=excluded.updated_at, last_accessed_at=excluded.last_accessed_at, access_count=excluded.access_count"""
+
+
 def cmd_import(args):
     try:
-        with open(args.file, "r", encoding="utf-8", newline="\n") as f:
+        with open(args.file, "r", encoding="utf-8-sig", newline="\n") as f:
             data = json.load(f)
     except Exception as e:
         print(f"Failed to load file: {e}")
@@ -240,39 +246,72 @@ def cmd_import(args):
         print("Invalid format: expected a JSON array of memories.")
         sys.exit(1)
 
-    
     conn = server.get_db()
-    conn.execute("BEGIN TRANSACTION")
-    imported = 0
+    date_re = re.compile(r"^\d{4}-\d{2}-\d{2}")
+
+    def safe_date(d):
+        return str(d) if date_re.match(str(d)) else server.now()
+
+    records = []
     for r in data:
-        content = str(r.get("content", ""))[:8000]
+        if not isinstance(r, dict):
+            print("Skipping malformed memory (expected an object)")
+            continue
         try:
-            imp = max(1, min(10, int(r.get("importance", 5) or 5)))
-        except (ValueError, TypeError):
-            imp = 5
-            
-        def safe_date(d):
-            return str(d) if re.match(r"^\d{4}-\d{2}-\d{2}", str(d)) else server.now()
-            
-        created = safe_date(r.get("created_at", server.now()))
-        updated = safe_date(r.get("updated_at", server.now()))
-        
-        try:
-            conn.execute(
-                """INSERT INTO memories (id,category,content,tags,importance,created_at,updated_at,access_count,last_accessed_at)
-                   VALUES(?,?,?,?,?,?,?,?,?)
-                   ON CONFLICT(id) DO UPDATE SET
-                   category=excluded.category, content=excluded.content, tags=excluded.tags, importance=excluded.importance, updated_at=excluded.updated_at, last_accessed_at=excluded.last_accessed_at, access_count=excluded.access_count""",
-                (r["id"], r.get("category", "general"), content, r.get("tags", ""), imp, created, updated, r.get("access_count", 0), r.get("last_accessed_at", "")),
+            content = str(r.get("content", ""))[:8000]
+            try:
+                imp = max(1, min(10, int(r.get("importance", 5) or 5)))
+            except (ValueError, TypeError):
+                imp = 5
+            created = safe_date(r.get("created_at", server.now()))
+            updated = safe_date(r.get("updated_at", server.now()))
+            records.append(
+                (
+                    r["id"],
+                    r.get("category", "general"),
+                    content,
+                    r.get("tags", ""),
+                    imp,
+                    created,
+                    updated,
+                    r.get("access_count", 0),
+                    r.get("last_accessed_at", ""),
+                )
             )
-            imported += 1
         except KeyError as e:
             print(f"Skipping malformed memory (missing {e})")
         except Exception as e:
             print(f"Error importing memory: {e}")
 
-    conn.commit()
-    conn.close()
+    imported = 0
+    try:
+        conn.execute("BEGIN TRANSACTION")
+        if records:
+            try:
+                conn.executemany(_IMPORT_SQL, records)
+                imported = len(records)
+            except Exception as batch_err:
+                # One bad row must not discard the rest of the file.
+                conn.rollback()
+                conn.execute("BEGIN TRANSACTION")
+                print(f"Bulk import failed ({batch_err}); retrying row by row")
+                for rec in records:
+                    conn.execute("SAVEPOINT row_import")
+                    try:
+                        conn.execute(_IMPORT_SQL, rec)
+                    except Exception as e:
+                        conn.execute("ROLLBACK TO SAVEPOINT row_import")
+                        print(f"Error importing memory: {e}")
+                    else:
+                        imported += 1
+                    finally:
+                        conn.execute("RELEASE SAVEPOINT row_import")
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
     print(f"Imported {imported} memories from {args.file}")
 
 
