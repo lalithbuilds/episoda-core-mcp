@@ -29,8 +29,6 @@ def now():
 
 
 def cmd_save(args):
-    import json
-    import server
     content = " ".join(args.content)
     importance = max(1, min(10, args.importance))
     res = server.t_save({
@@ -46,7 +44,6 @@ def cmd_save(args):
         
     if "error" in res:
         print(f"Error: {res['error']}")
-        import sys
         sys.exit(1)
         
     if "warnings" in res and res["warnings"]:
@@ -201,7 +198,6 @@ def cmd_stats(args):
 
 
 def cmd_delete(args):
-    import sys
     conn = get_db()
     cursor = conn.execute("DELETE FROM memories WHERE id=?", (args.id,))
     if cursor.rowcount == 0:
@@ -224,7 +220,6 @@ def cmd_export(args):
         print(f"Exported {len(data)} memories to {args.file}")
     except Exception as e:
         print(f"Failed to export: {e}")
-        import sys
         sys.exit(1)
 
 
@@ -322,7 +317,6 @@ def cmd_tui(args):
         print("curses module not available on this platform.")
         return
 
-    import sys
     if not sys.stdout.isatty():
         print("TUI requires a real terminal.")
         return
