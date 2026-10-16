@@ -14,6 +14,30 @@ import engram
 import server
 
 
+class TestSafeInt(unittest.TestCase):
+    def test_safe_int_valid(self):
+        self.assertEqual(server.safe_int("10", 5), 10)
+        self.assertEqual(server.safe_int(10, 5), 10)
+
+    def test_safe_int_invalid(self):
+        self.assertEqual(server.safe_int("abc", 5), 5)
+        self.assertEqual(server.safe_int(None, 5), 5)
+        self.assertEqual(server.safe_int([], 5), 5)
+
+    def test_safe_int_lo_bound(self):
+        self.assertEqual(server.safe_int("10", 5, lo=15), 15)
+        self.assertEqual(server.safe_int("20", 5, lo=15), 20)
+
+    def test_safe_int_hi_bound(self):
+        self.assertEqual(server.safe_int("20", 5, hi=15), 15)
+        self.assertEqual(server.safe_int("10", 5, hi=15), 10)
+
+    def test_safe_int_lo_hi_bound(self):
+        self.assertEqual(server.safe_int("5", 10, lo=10, hi=20), 10)
+        self.assertEqual(server.safe_int("25", 10, lo=10, hi=20), 20)
+        self.assertEqual(server.safe_int("15", 10, lo=10, hi=20), 15)
+        self.assertEqual(server.safe_int("abc", 10, lo=5, hi=15), 10)
+
 class TestEngramMCP(unittest.TestCase):
     def setUp(self):
         self.conn = server.get_db()
