@@ -55,7 +55,7 @@ def cmd_save(args):
 
 def cmd_search(args):
     query = " ".join(args.query)
-    limit = max(1, min(100, args.limit or 5))
+    limit = max(1, min(100, args.limit if args.limit is not None else 5))
     conn = get_db()
     query_clean = re.sub(r"[^\w\s]", " ", query).strip()
 
@@ -79,8 +79,8 @@ def cmd_search(args):
 
     if not rows:
         rows = conn.execute(
-            "SELECT id,category,content,tags,importance,created_at FROM memories WHERE content LIKE ? ORDER BY importance DESC LIMIT ?",
-            (f"%{query}%", limit),
+            "SELECT id,category,content,tags,importance,created_at FROM memories WHERE content LIKE ? ESCAPE '\\' ORDER BY importance DESC LIMIT ?",
+            (server.like_contains(query), limit),
         ).fetchall()
 
     if rows:
@@ -108,8 +108,10 @@ def cmd_search(args):
 
 
 def cmd_recall(args):
-    limit = args.limit or 3
-    min_imp = args.min_importance or 7
+    # SQLite treats a negative LIMIT as "no limit", so an unchecked --limit -1
+    # would load every matching row and bump its access_count.
+    limit = max(1, min(100, args.limit if args.limit is not None else 3))
+    min_imp = max(1, min(10, args.min_importance if args.min_importance is not None else 7))
     conn = get_db()
     rows = conn.execute(
         "SELECT id,category,content,tags,importance FROM memories WHERE importance>=? ORDER BY importance DESC LIMIT ?",
@@ -142,7 +144,7 @@ def cmd_recall(args):
 def cmd_list(args):
     conn = server.get_db(read_only=True)
     rows = conn.execute(
-        "SELECT id,category,content,importance,created_at FROM memories ORDER BY importance DESC,created_at DESC LIMIT 1000"
+        "SELECT id,category,content,importance,created_at FROM memories ORDER BY importance DESC,created_at DESC"
     ).fetchall()
     conn.close()
 
@@ -152,14 +154,7 @@ def cmd_list(args):
         return
 
     if not rows:
-        if getattr(args, 'json', False):
-            print("[]")
-        else:
-            print("Memory bank is empty.")
-        return
-    if getattr(args, 'json', False):
-        data = [dict(r) for r in rows]
-        print(json.dumps(data, indent=2))
+        print("Memory bank is empty.")
         return
     print(f"{'ID':<14} {'CAT':<12} {'IMP':<5} {'DATE':<12} CONTENT")
     print("-" * 80)
@@ -391,7 +386,11 @@ def main():
     )
 
     p_list = sub.add_parser("list", help="List all memories")
-    p_list.add_argument("--json", action="store_true", help="Output raw JSON array")
+    # default=SUPPRESS so `engram --json list` keeps the parent flag. A child
+    # store_true otherwise defaults to False and overwrites it.
+    p_list.add_argument(
+        "--json", action="store_true", default=argparse.SUPPRESS, help="Output raw JSON array"
+    )
     sub.add_parser("stats", help="DB stats")
 
     p_del = sub.add_parser("delete", help="Delete a memory by ID")

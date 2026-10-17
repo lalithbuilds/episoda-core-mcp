@@ -52,6 +52,12 @@ _LAST_DECAY_RUN = 0
 
 def get_db(read_only=False):
     global _SCHEMA_INITIALIZED, _LAST_DECAY_RUN
+    # chmod below skips symlinks, but sqlite3.connect follows them. Refuse
+    # before opening so a planted link cannot redirect the database file.
+    if DB_PATH.is_symlink():
+        raise sqlite3.OperationalError(
+            f"Refusing to open symlinked database path: {DB_PATH}"
+        )
     DB_PATH.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     conn = sqlite3.connect(str(DB_PATH), timeout=10.0)
     try:
@@ -101,16 +107,20 @@ def get_db(read_only=False):
                 should_backup = False
 
         if should_backup and DB_PATH.exists():
-            try:
-                backup_conn = sqlite3.connect(str(backup_path))
-                conn.backup(backup_conn)
-                backup_conn.close()
-                # Update mtime on the backup to track correctly
-                backup_path.touch()
-                if not backup_path.is_symlink():
+            if backup_path.is_symlink():
+                sys.stderr.write(
+                    f"[episoda-backup] Refusing to write backup through symlink: {backup_path}\n"
+                )
+            else:
+                try:
+                    backup_conn = sqlite3.connect(str(backup_path))
+                    conn.backup(backup_conn)
+                    backup_conn.close()
+                    # Update mtime on the backup to track correctly
+                    backup_path.touch()
                     os.chmod(backup_path, 0o600)
-            except Exception as e:
-                sys.stderr.write(f"[episoda-backup] Backup failed: {e}\n")
+                except Exception as e:
+                    sys.stderr.write(f"[episoda-backup] Backup failed: {e}\n")
 
     return conn
 
@@ -121,6 +131,16 @@ def now():
 
 def make_id(content):
     return hashlib.sha1(f"{content}".encode()).hexdigest()[:12]
+
+
+def like_contains(text):
+    """LIKE pattern that matches text as a literal substring.
+
+    `%` and `_` are wildcards unless escaped, so a search for those
+    characters must not turn into a match-everything query.
+    """
+    escaped = str(text).replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    return f"%{escaped}%"
 
 
 def safe_int(val, default, lo=None, hi=None):
@@ -208,8 +228,8 @@ def t_smart_search(a):
 
     if not rows:
         rows = conn.execute(
-            "SELECT id, category, content, tags, importance, created_at, updated_at, access_count, last_accessed_at FROM memories WHERE content LIKE ? ORDER BY importance DESC LIMIT ?",
-            (f"%{query}%", limit),
+            "SELECT id, category, content, tags, importance, created_at, updated_at, access_count, last_accessed_at FROM memories WHERE content LIKE ? ESCAPE '\\' ORDER BY importance DESC LIMIT ?",
+            (like_contains(query), limit),
         ).fetchall()
 
     if rows:
@@ -535,10 +555,11 @@ def main():
                 print(f"Integrity:     {integrity}")
             except Exception as e:
                 print(f"Diagnostics Error: {e}")
+                sys.exit(1)
             sys.exit(0)
         else:
             print("Usage: python3 server.py [--diagnostics]")
-            sys.exit(0)
+            sys.exit(1)
     get_db().close()
 
     if hasattr(sys.stdout, 'reconfigure'):
